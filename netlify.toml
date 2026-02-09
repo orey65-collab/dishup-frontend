@@ -1,0 +1,61 @@
+# Netlify configuration for DishUp frontend
+
+[build]
+  # Build command
+  command = "yarn build"
+  
+  # Output directory
+  publish = "build"
+  
+  # Build environment variables
+  [build.environment]
+    NODE_VERSION = "18"
+    YARN_VERSION = "1.22.19"
+
+# Redirect all requests to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+# Headers for security and caching
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+
+# Cache static assets for 1 year
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images for 1 month
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# Environment-specific settings
+[context.production]
+  [context.production.environment]
+    # You'll need to set this in Netlify UI:
+    # REACT_APP_BACKEND_URL = "https://your-backend-url.com"
+
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    # Preview deployments can use production backend
+    # Or set a separate staging backend URL

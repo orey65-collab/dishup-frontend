@@ -1,0 +1,467 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* DishUp - Cooking Mama Cartoon Style */
+        /* Primary: Vibrant Orange - Fun, appetizing, energetic */
+        --primary: 28 95% 55%;
+        --primary-light: 35 100% 62%;
+        --primary-dark: 22 90% 45%;
+        --primary-foreground: 0 0% 100%;
+        
+        /* Accent: Lime Green - Fresh, playful, veggie vibes */
+        --accent: 85 70% 50%;
+        --accent-light: 90 75% 60%;
+        --accent-dark: 80 65% 40%;
+        --accent-foreground: 0 0% 100%;
+        
+        /* Secondary: Sunny Yellow - Cheerful, warm */
+        --secondary: 45 100% 60%;
+        --secondary-light: 48 100% 70%;
+        --secondary-foreground: 30 80% 25%;
+        
+        /* Tertiary: Teal/Aqua - Cool, refreshing */
+        --tertiary: 175 60% 45%;
+        --tertiary-light: 175 65% 55%;
+        --tertiary-foreground: 0 0% 15%;
+        
+        /* Background: Light Aqua Green - Fresh kitchen feel */
+        --background: 170 40% 95%;
+        --background-soft: 170 35% 92%;
+        --foreground: 170 30% 15%;
+        
+        /* Card & Surface - Crisp white with aqua tint */
+        --card: 170 30% 99%;
+        --card-foreground: 170 30% 15%;
+        --card-elevated: 0 0% 100%;
+        
+        /* Popover */
+        --popover: 0 0% 100%;
+        --popover-foreground: 170 30% 15%;
+        
+        /* Muted: Soft aqua grays */
+        --muted: 170 20% 92%;
+        --muted-foreground: 170 15% 40%;
+        
+        /* Border & Input - Cartoon style borders */
+        --border: 30 30% 85%;
+        --input: 40 30% 92%;
+        --ring: 28 95% 55%;
+        
+        /* Destructive: Tomato Red */
+        --destructive: 5 75% 55%;
+        --destructive-foreground: 0 0% 100%;
+        
+        /* Success: Veggie Green */
+        --success: 140 65% 45%;
+        --success-foreground: 0 0% 100%;
+        
+        /* Warning: Cheese Yellow */
+        --warning: 45 100% 50%;
+        --warning-foreground: 30 80% 20%;
+        
+        /* Charts - Food colors */
+        --chart-1: 28 95% 55%;
+        --chart-2: 85 70% 50%;
+        --chart-3: 185 70% 50%;
+        --chart-4: 45 100% 55%;
+        --chart-5: 5 75% 55%;
+        
+        /* Radius - Extra rounded for cartoon feel */
+        --radius: 1rem;
+        --radius-lg: 1.5rem;
+        --radius-xl: 2rem;
+        --radius-full: 9999px;
+        
+        /* Cartoon Shadows - Offset for playful depth */
+        --shadow-cartoon: 4px 4px 0px hsl(170 30% 80%);
+        --shadow-cartoon-sm: 2px 2px 0px hsl(170 30% 80%);
+        --shadow-cartoon-lg: 6px 6px 0px hsl(170 30% 75%);
+        --shadow-cartoon-primary: 4px 4px 0px hsl(22 90% 40%);
+        --shadow-cartoon-accent: 4px 4px 0px hsl(80 65% 35%);
+        --shadow-cartoon-secondary: 4px 4px 0px hsl(40 90% 45%);
+        
+        /* Soft shadows for depth */
+        --shadow-soft: 0 4px 12px hsl(170 30% 60% / 0.3);
+        --shadow-elevated: 0 8px 24px hsl(170 30% 50% / 0.25);
+        
+        /* Transitions - Bouncy for cartoon feel */
+        --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        --transition-fast: 150ms ease-out;
+        --transition-base: 200ms ease-out;
+    }
+    
+    .dark {
+        --primary: 28 90% 60%;
+        --primary-light: 35 95% 65%;
+        --primary-dark: 22 85% 50%;
+        
+        --accent: 85 65% 55%;
+        --accent-light: 90 70% 65%;
+        
+        --secondary: 45 95% 55%;
+        --secondary-light: 48 100% 65%;
+        --secondary-foreground: 0 0% 100%;
+        
+        --tertiary: 175 55% 50%;
+        --tertiary-foreground: 0 0% 100%;
+        
+        --background: 170 25% 10%;
+        --background-soft: 170 20% 14%;
+        --foreground: 170 20% 95%;
+        
+        --card: 170 20% 14%;
+        --card-foreground: 170 20% 95%;
+        --card-elevated: 170 15% 18%;
+        
+        --popover: 170 20% 14%;
+        --popover-foreground: 170 20% 95%;
+        
+        --muted: 170 15% 20%;
+        --muted-foreground: 170 15% 60%;
+        
+        --border: 170 15% 25%;
+        --input: 170 15% 20%;
+        
+        --shadow-cartoon: 4px 4px 0px hsl(170 20% 5%);
+        --shadow-cartoon-sm: 2px 2px 0px hsl(30 30% 5%);
+        --shadow-cartoon-lg: 6px 6px 0px hsl(30 25% 5%);
+        --shadow-cartoon-primary: 4px 4px 0px hsl(22 85% 35%);
+        --shadow-cartoon-accent: 4px 4px 0px hsl(80 60% 30%);
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+        @apply bg-background text-foreground antialiased;
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 500;
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Fredoka', 'Nunito', sans-serif;
+        font-weight: 600;
+    }
+    
+    button, a, input, textarea, select {
+        touch-action: manipulation;
+    }
+    
+    .scroll-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+    
+    .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+}
+
+@layer components {
+    /* Cartoon Primary Button */
+    .btn-cartoon-primary {
+        @apply font-bold rounded-2xl px-6 py-3.5 text-primary-foreground;
+        background: hsl(var(--primary));
+        border: 3px solid hsl(var(--primary-dark));
+        box-shadow: var(--shadow-cartoon-primary);
+        transition: all var(--transition-bounce);
+        font-family: 'Fredoka', sans-serif;
+    }
+    
+    .btn-cartoon-primary:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px hsl(var(--primary-dark));
+    }
+    
+    .btn-cartoon-primary:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px hsl(var(--primary-dark));
+    }
+    
+    /* Cartoon Accent Button */
+    .btn-cartoon-accent {
+        @apply font-bold rounded-2xl px-6 py-3.5 text-accent-foreground;
+        background: hsl(var(--accent));
+        border: 3px solid hsl(var(--accent-dark));
+        box-shadow: var(--shadow-cartoon-accent);
+        transition: all var(--transition-bounce);
+        font-family: 'Fredoka', sans-serif;
+    }
+    
+    .btn-cartoon-accent:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px hsl(var(--accent-dark));
+    }
+    
+    .btn-cartoon-accent:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px hsl(var(--accent-dark));
+    }
+    
+    /* Cartoon Secondary Button */
+    .btn-cartoon-secondary {
+        @apply font-bold rounded-2xl px-6 py-3.5;
+        background: hsl(var(--secondary));
+        color: hsl(var(--secondary-foreground));
+        border: 3px solid hsl(40 90% 45%);
+        box-shadow: var(--shadow-cartoon-secondary);
+        transition: all var(--transition-bounce);
+        font-family: 'Fredoka', sans-serif;
+    }
+    
+    .btn-cartoon-secondary:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px hsl(40 90% 40%);
+    }
+    
+    /* Cartoon Card */
+    .card-cartoon {
+        @apply bg-card rounded-3xl p-5;
+        border: 3px solid hsl(var(--border));
+        box-shadow: var(--shadow-cartoon);
+        transition: all var(--transition-bounce);
+    }
+    
+    .card-cartoon:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--shadow-cartoon-lg);
+    }
+    
+    /* Ingredient Tag - Cartoon Style */
+    .ingredient-tag-cartoon {
+        @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold;
+        background: hsl(var(--secondary));
+        color: hsl(var(--secondary-foreground));
+        border: 2px solid hsl(40 90% 45%);
+        box-shadow: var(--shadow-cartoon-sm);
+        transition: all var(--transition-bounce);
+        font-family: 'Fredoka', sans-serif;
+    }
+    
+    .ingredient-tag-cartoon:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Category Pill - Cartoon Style */
+    .category-pill-cartoon {
+        @apply flex flex-col items-center justify-center gap-2 p-4 rounded-3xl;
+        background: hsl(var(--card));
+        border: 3px solid hsl(var(--border));
+        box-shadow: var(--shadow-cartoon-sm);
+        transition: all var(--transition-bounce);
+        min-width: 80px;
+    }
+    
+    .category-pill-cartoon:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-cartoon);
+    }
+    
+    .category-pill-cartoon.active {
+        background: hsl(var(--primary) / 0.15);
+        border-color: hsl(var(--primary));
+        box-shadow: 3px 3px 0px hsl(var(--primary-dark));
+    }
+    
+    /* Bottom Navigation - Cartoon Style */
+    .bottom-nav-cartoon {
+        @apply fixed bottom-0 left-0 right-0 bg-card;
+        @apply flex items-center justify-around;
+        border-top: 4px solid hsl(var(--border));
+        padding-bottom: env(safe-area-inset-bottom, 12px);
+        box-shadow: 0 -4px 0 hsl(var(--background-soft));
+    }
+    
+    .nav-item-cartoon {
+        @apply flex flex-col items-center gap-1 py-3 px-5;
+        @apply text-muted-foreground font-semibold;
+        transition: all var(--transition-bounce);
+        font-family: 'Fredoka', sans-serif;
+    }
+    
+    .nav-item-cartoon.active {
+        @apply text-primary;
+        transform: scale(1.1);
+    }
+    
+    .nav-item-cartoon:hover {
+        @apply text-primary;
+    }
+    
+    /* Step Card - Cartoon Style */
+    .step-card-cartoon {
+        @apply bg-card rounded-3xl p-5;
+        border: 3px solid hsl(var(--tertiary));
+        box-shadow: 4px 4px 0px hsl(185 60% 40%);
+        animation: bounceIn 0.5s var(--transition-bounce);
+    }
+    
+    /* Input - Cartoon Style */
+    .input-cartoon {
+        @apply rounded-2xl px-5 py-3 text-base font-medium;
+        background: hsl(var(--card));
+        border: 3px solid hsl(var(--border));
+        box-shadow: var(--shadow-cartoon-sm);
+        transition: all var(--transition-fast);
+    }
+    
+    .input-cartoon:focus {
+        border-color: hsl(var(--primary));
+        box-shadow: var(--shadow-cartoon-primary);
+        outline: none;
+    }
+    
+    /* Badge - Cartoon Style */
+    .badge-cartoon {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold;
+        border: 2px solid currentColor;
+        box-shadow: 2px 2px 0px currentColor;
+    }
+    
+    .badge-easy {
+        @apply bg-accent/20 text-accent-dark;
+        border-color: hsl(var(--accent-dark));
+        box-shadow: 2px 2px 0px hsl(var(--accent-dark));
+    }
+    
+    .badge-medium {
+        @apply bg-secondary/30;
+        color: hsl(40 80% 30%);
+        border-color: hsl(40 80% 40%);
+        box-shadow: 2px 2px 0px hsl(40 80% 40%);
+    }
+    
+    .badge-hard {
+        @apply bg-destructive/20 text-destructive;
+        border-color: hsl(var(--destructive));
+        box-shadow: 2px 2px 0px hsl(var(--destructive));
+    }
+    
+    /* Loading Animation - Cooking Style */
+    .cooking-loader {
+        animation: cooking 0.6s ease-in-out infinite alternate;
+    }
+    
+    /* Scan Button Pulse */
+    .scan-pulse-cartoon {
+        animation: cartoonPulse 1.5s infinite;
+    }
+}
+
+@layer utilities {
+    .text-cartoon-shadow {
+        text-shadow: 2px 2px 0px hsl(var(--primary-dark));
+    }
+    
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Keyframes */
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes cartoonPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: var(--shadow-cartoon-primary);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 6px 6px 0px hsl(var(--primary-dark)), 0 0 20px hsl(var(--primary) / 0.3);
+    }
+}
+
+@keyframes cooking {
+    0% { transform: rotate(-8deg) scale(1); }
+    100% { transform: rotate(8deg) scale(1.05); }
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-wiggle {
+    animation: wiggle 0.5s ease-in-out infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pop {
+    animation: pop 0.3s ease-out;
+}
+
+.animate-cooking {
+    animation: cooking 0.6s ease-in-out infinite alternate;
+}
+
+/* Debug wrapper fix */
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+    }
+}
