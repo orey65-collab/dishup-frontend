@@ -1,5 +1,36 @@
+/* =========================================
+   RIMOZIONE WATERMARK EMERGENT (DishUp)
+   ========================================= */
+
+/* Nasconde il badge "Made with Emergent" e i link correlati */
+[class*="emergent"], 
+[id*="emergent"],
+div[style*="bottom: 0"][style*="right: 0"], 
+div[style*="z-index: 9999"], 
+img[alt*="Emergent"], 
+a[href*="emergent.sh"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Protezione extra: solleva la barra di navigazione se il badge persiste */
+.pb-28 {
+    padding-bottom: 7rem !important; /* Aumenta lo spazio in fondo per sicurezza */
+}
+
+/* =========================================
+   STILI BASE APPLICAZIONE
+   ========================================= */
+
 .App {
-  /* Remove default centering */
+  /* Layout fluido per DishUp */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-header {
@@ -9,8 +40,21 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
+  background-color: hsl(var(--background));
 }
 
 .App-link {
   color: hsl(var(--primary));
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.App-link:hover {
+  opacity: 0.8;
+}
+
+/* Rendi le immagini responsive di default */
+img {
+  max-width: 100%;
+  height: auto;
 }
