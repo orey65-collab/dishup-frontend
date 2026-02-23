@@ -1,60 +1,68 @@
 /* =========================================
-   RIMOZIONE WATERMARK EMERGENT (DishUp)
+   FIX PER WATERMARK EMERGENT
+   Solleviamo la barra per renderla cliccabile
    ========================================= */
 
-/* Nasconde il badge "Made with Emergent" e i link correlati */
-[class*="emergent"], 
-[id*="emergent"],
-div[style*="bottom: 0"][style*="right: 0"], 
-div[style*="z-index: 9999"], 
-img[alt*="Emergent"], 
-a[href*="emergent.sh"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0 !important;
-    height: 0 !important;
+/* Identifica la barra di navigazione e la solleva */
+nav, 
+header + div + div, 
+[class*="BottomNav"], 
+.fixed.bottom-0 {
+    bottom: 35px !important; /* La alza sopra la scritta "Made with Emergent" */
+    left: 15px !important;
+    right: 15px !important;
+    width: calc(100% - 30px) !important;
+    border-radius: 24px !important; /* Effetto "pillola" moderna */
+    border: 3px solid #000 !important; /* Mantiene lo stile cartoon */
+    box-shadow: 0 8px 0 rgba(0,0,0,0.2) !important; /* Ombra stilizzata */
+    overflow: hidden;
 }
 
-/* Protezione extra: solleva la barra di navigazione se il badge persiste */
-.pb-28 {
-    padding-bottom: 7rem !important; /* Aumenta lo spazio in fondo per sicurezza */
+/* Aggiungiamo spazio in fondo alla pagina per non far coprire il contenuto */
+main, .min-h-screen {
+    padding-bottom: 120px !important;
+}
+
+/* Tentativo di rendere il watermark meno visibile */
+div[style*="z-index: 9999"] img, 
+a[href*="emergent.sh"] {
+    opacity: 0.3 !important; /* Lo rende quasi trasparente */
+    transition: opacity 0.3s;
+}
+
+div[style*="z-index: 9999"]:hover img {
+    opacity: 0.1 !important;
 }
 
 /* =========================================
-   STILI BASE APPLICAZIONE
+   STILI BASE DISHUP
    ========================================= */
 
 .App {
-  /* Layout fluido per DishUp */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: hsl(var(--background));
 }
 
 .App-header {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  background-color: hsl(var(--background));
 }
 
 .App-link {
   color: hsl(var(--primary));
   text-decoration: none;
-  transition: opacity 0.2s;
 }
 
-.App-link:hover {
-  opacity: 0.8;
+/* Rende le transizioni più fluide tra le sezioni */
+.fade-enter {
+  opacity: 0;
 }
-
-/* Rendi le immagini responsive di default */
-img {
-  max-width: 100%;
-  height: auto;
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
 }
