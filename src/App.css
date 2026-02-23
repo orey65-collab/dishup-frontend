@@ -1,68 +1,7 @@
-/* =========================================
-   FIX PER WATERMARK EMERGENT
-   Solleviamo la barra per renderla cliccabile
-   ========================================= */
-
-/* Identifica la barra di navigazione e la solleva */
-nav, 
-header + div + div, 
-[class*="BottomNav"], 
-.fixed.bottom-0 {
-    bottom: 35px !important; /* La alza sopra la scritta "Made with Emergent" */
-    left: 15px !important;
-    right: 15px !important;
-    width: calc(100% - 30px) !important;
-    border-radius: 24px !important; /* Effetto "pillola" moderna */
-    border: 3px solid #000 !important; /* Mantiene lo stile cartoon */
-    box-shadow: 0 8px 0 rgba(0,0,0,0.2) !important; /* Ombra stilizzata */
-    overflow: hidden;
-}
-
-/* Aggiungiamo spazio in fondo alla pagina per non far coprire il contenuto */
-main, .min-h-screen {
-    padding-bottom: 120px !important;
-}
-
-/* Tentativo di rendere il watermark meno visibile */
-div[style*="z-index: 9999"] img, 
-a[href*="emergent.sh"] {
-    opacity: 0.3 !important; /* Lo rende quasi trasparente */
-    transition: opacity 0.3s;
-}
-
-div[style*="z-index: 9999"]:hover img {
-    opacity: 0.1 !important;
-}
-
-/* =========================================
-   STILI BASE DISHUP
-   ========================================= */
-
-.App {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: hsl(var(--background));
-}
-
-.App-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-}
-
-.App-link {
-  color: hsl(var(--primary));
-  text-decoration: none;
-}
-
-/* Rende le transizioni più fluide tra le sezioni */
-.fade-enter {
-  opacity: 0;
-}
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-in;
+/* Forza lo spostamento di qualsiasi elemento fissato in basso */
+div[class*="fixed"][class*="bottom-0"], 
+section[class*="fixed"][class*="bottom-0"],
+nav {
+    bottom: 45px !important;
+    transform: translateY(-20px) !important;
 }
