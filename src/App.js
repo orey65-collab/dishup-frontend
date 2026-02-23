@@ -13,6 +13,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import axios from 'axios';
 
+// Assicurati che l'URL sia corretto nelle variabili d'ambiente di Netlify
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const MainApp = () => {
@@ -20,26 +21,42 @@ const MainApp = () => {
   const [currentRecipe, setCurrentRecipe] = useState(null);
   const [generatedRecipes, setGeneratedRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState('input'); // 'input' | 'selection' | 'recipe'
+  const [view, setView] = useState('input');
+
+  // FUNZIONE DI CORREZIONE DATI (Normalization)
+  // Questa funzione assicura che i campi abbiano i nomi giusti per il frontend
+  const normalizeRecipes = (recipes) => {
+    return recipes.map(r => ({
+      ...r,
+      // Se il server manda ingredients_list lo usiamo, altrimenti cerchiamo nomi simili
+      ingredients: r.ingredients_list || r.ingredients || [],
+      // Mappatura per il "Perché è speciale"
+      special_reason: r.special_reason || r.origin_story || "Una ricetta originale creata apposta per te!",
+      // Mappatura per il Sommelier
+      sommelier_advice: r.sommelier_advice || r.wine_pairing || "Un buon vino bianco fresco.",
+      // Mappatura procedura
+      steps: r.procedure || r.steps || []
+    }));
+  };
 
   const handleGenerateRecipe = async (params) => {
     setIsLoading(true);
-    
     try {
       console.log('Generating recipe with params:', params);
       const response = await axios.post(`${API}/generate-recipe`, params);
-      console.log('Recipe generation response:', response.data);
-      const recipes = response.data.recipes;
       
-      if (recipes && recipes.length > 0) {
-        console.log('Setting recipes and switching to selection view:', recipes.length);
-        setGeneratedRecipes(recipes);
+      if (response.data && response.data.recipes) {
+        // Applichiamo la normalizzazione prima di salvare
+        const cleanRecipes = normalizeRecipes(response.data.recipes);
+        console.log('Recipes normalized:', cleanRecipes);
+        
+        setGeneratedRecipes(cleanRecipes);
         setView('selection');
       } else {
-        console.error('No recipes received from API');
+        console.error('Nessuna ricetta ricevuta');
       }
     } catch (error) {
-      console.error('Recipe generation error:', error);
+      console.error('Errore generazione ricetta:', error);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +86,6 @@ const MainApp = () => {
   };
 
   const renderContent = () => {
-    // If viewing recipe selection
     if (view === 'selection' && generatedRecipes.length > 0) {
       return (
         <RecipeSelectionScreen
@@ -80,7 +96,6 @@ const MainApp = () => {
       );
     }
 
-    // If viewing a single recipe
     if (view === 'recipe' && currentRecipe) {
       return (
         <RecipeScreen
@@ -92,12 +107,7 @@ const MainApp = () => {
 
     switch (activeTab) {
       case 'home':
-        return (
-          <InputScreen
-            onGenerateRecipe={handleGenerateRecipe}
-            isLoading={isLoading}
-          />
-        );
+        return <InputScreen onGenerateRecipe={handleGenerateRecipe} isLoading={isLoading} />;
       case 'favorites':
         return <FavoritesScreen onSelectRecipe={handleSelectFavorite} />;
       case 'profile':
@@ -109,18 +119,15 @@ const MainApp = () => {
 
   return (
     <div className="min-h-screen min-h-[100dvh] bg-background">
-      {/* Main Content */}
       <main className="relative">
         {renderContent()}
       </main>
 
-      {/* Bottom Navigation - show only on input view, always visible but HOME resets view */}
       {view === 'input' && (
         <BottomNav
           activeTab={activeTab}
           onTabChange={(tab) => {
             if (tab === 'home') {
-              // Reset everything when HOME is clicked
               setView('input');
               setCurrentRecipe(null);
               setGeneratedRecipes([]);
@@ -133,10 +140,7 @@ const MainApp = () => {
         />
       )}
 
-      {/* Loading Overlay */}
       {isLoading && <LoadingOverlay />}
-
-      {/* Toast notifications */}
       <Toaster position="top-center" richColors />
     </div>
   );
