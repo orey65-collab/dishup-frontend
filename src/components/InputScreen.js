@@ -19,6 +19,37 @@ const COURSE_TYPES = [
   { id: 'dessert', icon: '🍰', labelKey: 'dessert' },
 ];
 
+// --- FUNZIONE DI UTILITÀ PER IL RIDIMENSIONAMENTO (ANTI-CRASH MOBILE) ---
+const resizeImage = (base64Str, maxWidth = 1024, maxHeight = 1024) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      // Esporta come JPEG compresso al 70% per risparmiare memoria
+      resolve(canvas.toDataURL('image/jpeg', 0.7));
+    };
+  });
+};
+
 export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const { t, language } = useLanguage();
   const { ingredients, addIngredient, addIngredients, removeIngredient, clearPantry } = usePantry();
@@ -31,7 +62,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const [vegan, setVegan] = useState(false);
   const [vegetarian, setVegetarian] = useState(false);
   const [glutenFree, setGlutenFree] = useState(false);
-  const [gymGoal, setGymGoal] = useState('none'); // 'none', 'bulk', 'cut'
+  const [gymGoal, setGymGoal] = useState('none'); 
   const [showCameraCapture, setShowCameraCapture] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   
@@ -71,6 +102,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
     }
   };
 
+  // --- GESTIONE CATTURA IMMAGINE OTTIMIZZATA ---
   const handleImageCapture = async (imageData) => {
     if (!imageData) return;
     
@@ -78,11 +110,17 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
     setShowCameraCapture(false);
     
     try {
-      const base64 = imageData.includes(',') ? imageData.split(',')[1] : imageData;
+      // 1. Ridimensiona l'immagine prima di inviarla (fondamentale per Render e Browser mobile)
+      const compressedImage = await resizeImage(imageData);
+      
+      // 2. Estrai solo la parte base64
+      const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
+      
+      // 3. Invia al backend con un timeout più lungo per dare tempo a Render di "svegliarsi"
       const response = await axios.post(`${API}/analyze-image`, {
         image_base64: base64,
         language
-      }, { timeout: 30000 });
+      }, { timeout: 60000 });
       
       const detectedIngredients = response.data.ingredients || [];
       if (detectedIngredients.length > 0) {
@@ -93,7 +131,10 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
       }
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error(language === 'it' ? 'Errore nell\'analisi' : 'Analysis error');
+      const errorMsg = language === 'it' 
+        ? "Errore nell'analisi. L'immagine potrebbe essere troppo grande o il server è in standby." 
+        : "Analysis error. Image might be too large or server is waking up.";
+      toast.error(errorMsg);
     } finally {
       setIsScanning(false);
     }
@@ -114,7 +155,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
       vegetarian,
       gluten_free: glutenFree,
       language,
-      gym_goal: gymGoal // <-- Nuovo parametro per il backend
+      gym_goal: gymGoal 
     });
   };
 
@@ -240,7 +281,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         )}
       </div>
 
-      {/* Course Type Selector */}
+      {/* Course Selector */}
       <div className="px-5 mt-6">
         <h2 className="text-lg font-display font-bold text-foreground mb-3 flex items-center gap-2">
           <span>🍽️</span>
@@ -262,7 +303,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* --- SEZIONE GYMRAT (NOVITÀ) --- */}
+      {/* GymRat Section */}
       <div className="px-5 mt-6">
         <h2 className="text-lg font-display font-bold text-foreground mb-3 flex items-center gap-2">
           <Dumbbell className="w-5 h-5 text-orange-600" />
@@ -302,7 +343,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Filters & Dietary Preferences */}
+      {/* Dietary & Filters */}
       <div className="px-5 mt-6">
         <h2 className="text-lg font-display font-bold text-foreground mb-3 flex items-center gap-2">
           <span>⚡</span>
@@ -310,85 +351,3 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </h2>
         <div className="card-cartoon p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl border-2 border-secondary-foreground/20">⚡</div>
-              <div>
-                <Label htmlFor="quick" className="text-sm font-bold">{t('quick_recipes')}</Label>
-                <p className="text-xs text-muted-foreground font-medium">{t('quick_recipes_sub')}</p>
-              </div>
-            </div>
-            <Switch id="quick" checked={quickRecipe} onCheckedChange={setQuickRecipe} />
-          </div>
-          <div className="w-full h-0.5 bg-border rounded-full" />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-xl border-2 border-accent-dark/20">⭐</div>
-              <Label htmlFor="gourmet" className="text-sm font-bold">{t('gourmet_recipes')}</Label>
-            </div>
-            <Switch id="gourmet" checked={gourmet} onCheckedChange={setGourmet} />
-          </div>
-        </div>
-      </div>
-
-      <div className="px-5 mt-6">
-        <h2 className="text-lg font-display font-bold text-foreground mb-3 flex items-center gap-2">
-          <span>🥗</span>
-          {t('dietary')}
-        </h2>
-        <div className="card-cartoon p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-xl border-2 border-accent/30">🌱</div>
-              <Label htmlFor="vegan" className="text-sm font-bold">{t('vegan')}</Label>
-            </div>
-            <Switch id="vegan" checked={vegan} onCheckedChange={(c) => { setVegan(c); if(c) setVegetarian(true); }} />
-          </div>
-          <div className="w-full h-0.5 bg-border rounded-full" />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-tertiary/20 flex items-center justify-center text-xl border-2 border-tertiary/30">🥬</div>
-              <Label htmlFor="vegetarian" className="text-sm font-bold">{t('vegetarian')}</Label>
-            </div>
-            <Switch id="vegetarian" checked={vegetarian} onCheckedChange={setVegetarian} disabled={vegan} />
-          </div>
-          <div className="w-full h-0.5 bg-border rounded-full" />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl border-2 border-secondary-foreground/20">🌾</div>
-              <Label htmlFor="glutenFree" className="text-sm font-bold">{t('gluten_free')}</Label>
-            </div>
-            <Switch id="glutenFree" checked={glutenFree} onCheckedChange={setGlutenFree} />
-          </div>
-        </div>
-      </div>
-
-      {/* Generate Button */}
-      <div className="px-5 mt-8">
-        <button
-          onClick={handleGenerate}
-          disabled={ingredients.length === 0 || isLoading}
-          className="w-full h-16 btn-cartoon-accent text-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <>
-              <span className="text-2xl animate-cooking">🍳</span>
-              {t('generating')}
-            </>
-          ) : (
-            <>
-              <Logo size={28} />
-              {t('generate_recipe')}
-            </>
-          )}
-        </button>
-      </div>
-
-      {showCameraCapture && (
-        <CameraCapture
-          onCapture={handleImageCapture}
-          onClose={() => setShowCameraCapture(false)}
-        />
-      )}
-    </div>
-  );
-};
