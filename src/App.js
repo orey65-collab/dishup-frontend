@@ -13,7 +13,6 @@ import { BottomNav } from '@/components/BottomNav';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import axios from 'axios';
 
-// Assicurati che l'URL sia corretto nelle variabili d'ambiente di Netlify
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const MainApp = () => {
@@ -23,40 +22,46 @@ const MainApp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState('input');
 
-  // FUNZIONE DI CORREZIONE DATI (Normalization)
-  // Questa funzione assicura che i campi abbiano i nomi giusti per il frontend
+  // NORMALIZZAZIONE DATI AGGIORNATA PER GYMRAT & PREMIUM
   const normalizeRecipes = (recipes) => {
     return recipes.map(r => ({
       ...r,
-      // Se il server manda ingredients_list lo usiamo, altrimenti cerchiamo nomi simili
       ingredients: r.ingredients_list || r.ingredients || [],
-      // Mappatura per il "Perché è speciale"
-      special_reason: r.special_reason || r.origin_story || "Una ricetta originale creata apposta per te!",
-      // Mappatura per il Sommelier
-      sommelier_advice: r.sommelier_advice || r.wine_pairing || "Un buon vino bianco fresco.",
-      // Mappatura procedura
-      steps: r.procedure || r.steps || []
+      special_reason: r.special_reason || "Una ricetta esclusiva per DishUp!",
+      sommelier_advice: r.sommelier_advice || r.wine_pairing || "Un abbinamento selezionato.",
+      steps: r.procedure || r.steps || [],
+      // Gestione Macros (Proteine, Carboidrati, Grassi)
+      macros: r.macros || null 
     }));
   };
 
   const handleGenerateRecipe = async (params) => {
     setIsLoading(true);
     try {
-      console.log('Generating recipe with params:', params);
-      const response = await axios.post(`${API}/generate-recipe`, params);
+      // INIEZIONE CODICE SVILUPPATORE E LOGICA PREMIUM
+      const enrichedParams = {
+        ...params,
+        user_id: "DISHUP_ADMIN_2026", // Il tuo lasciapassare admin
+        is_premium: true,             // Attiva le funzioni Premium (Macros/Vini)
+        gym_goal: params.gym_goal || 'none' // 'bulk', 'cut' o 'none'
+      };
+
+      console.log('DishUp Admin Mode - Sending:', enrichedParams);
+      
+      const response = await axios.post(`${API}/generate-recipe`, enrichedParams);
       
       if (response.data && response.data.recipes) {
-        // Applichiamo la normalizzazione prima di salvare
         const cleanRecipes = normalizeRecipes(response.data.recipes);
-        console.log('Recipes normalized:', cleanRecipes);
+        console.log('Recipes Loaded with Macros:', cleanRecipes);
         
         setGeneratedRecipes(cleanRecipes);
         setView('selection');
       } else {
-        console.error('Nessuna ricetta ricevuta');
+        console.error('Nessuna ricetta ricevuta dal server');
       }
     } catch (error) {
       console.error('Errore generazione ricetta:', error);
+      // Qui potresti aggiungere un messaggio toast per l'utente se l'API fallisce
     } finally {
       setIsLoading(false);
     }
