@@ -1,7 +1,3 @@
-Capisco, la visualizzazione dei blocchi di codice sta continuando a dare problemi. Ecco tutto il codice di src/components/InputScreen.js inviato come testo semplice.
-
-Copia tutto quello che vedi tra le due linee tratteggiate e incollalo nel tuo file:
-
 import { Camera, Search, Plus, X, Dumbbell } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
