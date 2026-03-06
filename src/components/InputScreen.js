@@ -1,3 +1,7 @@
+Capisco, la visualizzazione dei blocchi di codice sta continuando a dare problemi. Ecco tutto il codice di src/components/InputScreen.js inviato come testo semplice.
+
+Copia tutto quello che vedi tra le due linee tratteggiate e incollalo nel tuo file:
+
 import { Camera, Search, Plus, X, Dumbbell } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +14,7 @@ import { CameraCapture } from '@/components/CameraCapture';
 import { toast } from 'sonner';
 import axios from 'axios';
 
-const API = ${process.env.REACT_APP_BACKEND_URL}/api;
+const API = ${process.env.REACT_APP_API_URL};
 
 const COURSE_TYPES = [
 { id: 'antipasto', icon: '🥗', labelKey: 'appetizer' },
@@ -66,12 +70,12 @@ setSuggestions([]);
 return;
 }
 try {
-const response = await axios.post(${API}/ingredients/search, { query, language });
+const response = await axios.post(${API}/api/ingredients/search, { query, language });
 setSuggestions(response.data.suggestions || []);
 } catch (error) {
 console.error('Search error:', error);
 }
-}, [language, API]);
+}, [language]);
 
 const handleSearchChange = (e) => {
 const value = e.target.value;
@@ -93,7 +97,7 @@ setShowCameraCapture(false);
 try {
 const compressedImage = await resizeImage(imageData);
 const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
-const response = await axios.post(${API}/analyze-image, {
+const response = await axios.post(${API}/api/analyze-image, {
 image_base64: base64,
 language
 }, { timeout: 60000 });
@@ -103,7 +107,8 @@ addIngredients(detected);
 toast.success(t('ingredients_added') || 'Aggiunti!');
 }
 } catch (error) {
-toast.error("Errore analisi.");
+console.error('Analysis error:', error);
+toast.error("Errore analisi immagine.");
 } finally {
 setIsScanning(false);
 }
@@ -126,11 +131,13 @@ gym_goal: gymGoal
 
 return (
 <div className="flex flex-col min-h-full pb-32">
-<div className="bg-secondary/30 px-5 pt-8 pb-10">
+<div className="bg-secondary/30 px-5 pt-8 pb-10 relative overflow-hidden">
+<div className="flex items-center gap-3 mb-2">
 <Logo size={48} />
-<h1 className="text-3xl font-bold mt-2">{t('app_title')}</h1>
+<h1 className="text-3xl font-display font-bold text-foreground">{t('app_title')}</h1>
+</div>
+<p className="text-muted-foreground font-medium">{t('app_subtitle')}</p>
 </div>
 
 );
 };
-       
