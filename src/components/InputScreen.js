@@ -10,7 +10,6 @@ import { CameraCapture } from '@/components/CameraCapture';
 import { toast } from 'sonner';
 import axios from 'axios';
 
-// Variabile d'ambiente pulita
 const API = process.env.REACT_APP_API_URL;
 
 const COURSE_TYPES = [
@@ -67,7 +66,6 @@ setSuggestions([]);
 return;
 }
 try {
-// FIX: Aggiunti backtick per l'URL
 const response = await axios.post(${API}/api/ingredients/search, { query, language });
 setSuggestions(response.data.suggestions || []);
 } catch (error) {
@@ -95,7 +93,6 @@ setShowCameraCapture(false);
 try {
 const compressedImage = await resizeImage(imageData);
 const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
-// FIX: Aggiunti backtick per l'URL
 const response = await axios.post(${API}/api/analyze-image, {
 image_base64: base64,
 language
