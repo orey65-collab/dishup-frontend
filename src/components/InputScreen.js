@@ -10,7 +10,8 @@ import { CameraCapture } from '@/components/CameraCapture';
 import { toast } from 'sonner';
 import axios from 'axios';
 
-const API = ${process.env.REACT_APP_API_URL};
+// FIX RIGA 13: Utilizzo di una stringa valida per la variabile d'ambiente
+const API = process.env.REACT_APP_API_URL;
 
 const COURSE_TYPES = [
 { id: 'antipasto', icon: '🥗', labelKey: 'appetizer' },
@@ -71,7 +72,7 @@ setSuggestions(response.data.suggestions || []);
 } catch (error) {
 console.error('Search error:', error);
 }
-}, [language]);
+}, [language, API]);
 
 const handleSearchChange = (e) => {
 const value = e.target.value;
