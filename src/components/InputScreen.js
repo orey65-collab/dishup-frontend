@@ -10,6 +10,7 @@ import { CameraCapture } from '@/components/CameraCapture';
 import { toast } from 'sonner';
 import axios from 'axios';
 
+// CORREZIONE RIGA 13: Aggiunti i backtick per la corretta interpolazione
 const API = ${process.env.REACT_APP_API_URL};
 
 const COURSE_TYPES = [
@@ -71,7 +72,7 @@ setSuggestions(response.data.suggestions || []);
 } catch (error) {
 console.error('Search error:', error);
 }
-}, [language]);
+}, [language, API]);
 
 const handleSearchChange = (e) => {
 const value = e.target.value;
@@ -100,11 +101,11 @@ language
 const detected = response.data.ingredients || [];
 if (detected.length > 0) {
 addIngredients(detected);
-toast.success(t('ingredients_added') || 'Aggiunti!');
+toast.success(t('ingredients_added') || 'Ingredienti aggiunti!');
 }
 } catch (error) {
 console.error('Analysis error:', error);
-toast.error("Errore analisi immagine.");
+toast.error("Errore nell'analisi dell'immagine.");
 } finally {
 setIsScanning(false);
 }
