@@ -66,7 +66,6 @@ setSuggestions([]);
 return;
 }
 try {
-// CORREZIONE RIGA 70: Inseriti backtick corretti
 const response = await axios.post(${API}/api/ingredients/search, { query, language });
 setSuggestions(response.data.suggestions || []);
 } catch (error) {
@@ -94,7 +93,6 @@ setShowCameraCapture(false);
 try {
 const compressedImage = await resizeImage(imageData);
 const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
-// CORREZIONE RIGA 103: Inseriti backtick corretti
 const response = await axios.post(${API}/api/analyze-image, {
 image_base64: base64,
 language
@@ -139,6 +137,3 @@ return (
 
 );
 };
-
-
-
