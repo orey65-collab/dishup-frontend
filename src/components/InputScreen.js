@@ -66,7 +66,7 @@ setSuggestions([]);
 return;
 }
 try {
-// MODIFICA RIGA 69: Inseriti backtick
+// RIGA 70 CORRETTA:
 const response = await axios.post(${API}/api/ingredients/search, { query, language });
 setSuggestions(response.data.suggestions || []);
 } catch (error) {
@@ -94,7 +94,7 @@ setShowCameraCapture(false);
 try {
 const compressedImage = await resizeImage(imageData);
 const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
-// MODIFICA RIGA 102: Inseriti backtick
+// RIGA 104 CORRETTA:
 const response = await axios.post(${API}/api/analyze-image, {
 image_base64: base64,
 language
