@@ -1,3 +1,7 @@
+Certamente. Ecco il codice completo di src/components/InputScreen.js in testo semplice.
+
+Ho corretto le righe 69 e 102 assicurandomi che l'URL sia racchiuso tra i backtick (`). Puoi selezionare tutto, copiare e incollare sopra il vecchio codice.
+
 import { Camera, Search, Plus, X, Dumbbell } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -66,6 +70,7 @@ setSuggestions([]);
 return;
 }
 try {
+// MODIFICA RIGA 69: Inseriti backtick
 const response = await axios.post(${API}/api/ingredients/search, { query, language });
 setSuggestions(response.data.suggestions || []);
 } catch (error) {
@@ -93,6 +98,7 @@ setShowCameraCapture(false);
 try {
 const compressedImage = await resizeImage(imageData);
 const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
+// MODIFICA RIGA 102: Inseriti backtick
 const response = await axios.post(${API}/api/analyze-image, {
 image_base64: base64,
 language
