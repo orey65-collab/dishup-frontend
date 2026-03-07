@@ -1,7 +1,3 @@
-Certamente. Ecco il codice completo di src/components/InputScreen.js in testo semplice.
-
-Ho corretto le righe 69 e 102 assicurandomi che l'URL sia racchiuso tra i backtick (`). Puoi selezionare tutto, copiare e incollare sopra il vecchio codice.
-
 import { Camera, Search, Plus, X, Dumbbell } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
