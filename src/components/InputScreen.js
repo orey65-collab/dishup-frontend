@@ -111,22 +111,30 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   };
 
   const handleGenerate = () => {
+    console.log("Generazione avviata con:", { ingredients, gymGoal, selectedCourse });
+
     if (ingredients.length === 0) {
       toast.error(t('add_at_least_one'));
       return;
     }
-    onGenerateRecipe({
-      ingredients,
-      course_type: selectedCourse,
-      quick_recipe: quickRecipe,
-      gourmet,
-      language,
-      gym_goal: gymGoal
-    });
+    
+    if (typeof onGenerateRecipe === 'function') {
+      onGenerateRecipe({
+        ingredients,
+        course_type: selectedCourse,
+        quick_recipe: quickRecipe,
+        gourmet,
+        language,
+        gym_goal: gymGoal
+      });
+    } else {
+      console.error("Errore: onGenerateRecipe non è una funzione.");
+    }
   };
 
   return (
     <div className="flex flex-col min-h-full pb-32">
+      {/* Header */}
       <div className="bg-secondary/30 px-5 pt-8 pb-10 relative overflow-hidden">
         <div className="flex items-center gap-3 mb-2">
           <Logo size={48} />
@@ -135,6 +143,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         <p className="text-muted-foreground font-medium">{t('app_subtitle')}</p>
       </div>
 
+      {/* Pulsante Fotocamera */}
       <div className="px-5 -mt-6">
         <button
           onClick={() => setShowCameraCapture(true)}
@@ -144,6 +153,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </button>
       </div>
 
+      {/* Ricerca Ingredienti */}
       <div className="px-5 mt-6 relative">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -166,6 +176,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         )}
       </div>
 
+      {/* Dispensa Corrente */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold text-lg">🧊 {t('current_pantry')}</h2>
         <div className="flex flex-wrap gap-2 mt-3">
@@ -175,9 +186,11 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
               <X className="w-4 h-4 cursor-pointer" onClick={() => removeIngredient(ing)} />
             </div>
           ))}
+          {ingredients.length === 0 && <p className="text-sm text-muted-foreground italic">La dispensa è vuota</p>}
         </div>
       </div>
 
+      {/* Tipo di Portata */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4">{t('course_type')}</h2>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
@@ -194,24 +207,26 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
+      {/* Obiettivi GymRat */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4 flex items-center gap-2"><Dumbbell className="w-5 h-5" /> GymRat</h2>
         <div className="card-cartoon p-4 grid grid-cols-2 gap-3">
           <button
-            onClick={() => setGymGoal(gymGoal === 'bulk' ? 'none' : 'bulk')}
-            className={`py-3 rounded-xl font-bold border-2 ${gymGoal === 'bulk' ? 'bg-orange-500 text-white border-black' : 'bg-white text-orange-500 border-orange-500'}`}
+            onClick={() => setGymGoal(prev => prev === 'bulk' ? 'none' : 'bulk')}
+            className={`py-3 rounded-xl font-bold border-2 transition-all ${gymGoal === 'bulk' ? 'bg-orange-500 text-white border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white text-orange-500 border-orange-500'}`}
           >
             🔥 Bulk
           </button>
           <button
-            onClick={() => setGymGoal(gymGoal === 'cut' ? 'none' : 'cut')}
-            className={`py-3 rounded-xl font-bold border-2 ${gymGoal === 'cut' ? 'bg-blue-500 text-white border-black' : 'bg-white text-blue-500 border-blue-500'}`}
+            onClick={() => setGymGoal(prev => prev === 'cut' ? 'none' : 'cut')}
+            className={`py-3 rounded-xl font-bold border-2 transition-all ${gymGoal === 'cut' ? 'bg-blue-500 text-white border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white text-blue-500 border-blue-500'}`}
           >
             ❄️ Cut
           </button>
         </div>
       </div>
 
+      {/* Filtri Extra */}
       <div className="px-5 mt-8 mb-10">
         <h2 className="font-display font-bold mb-4">⚡ {t('filters')}</h2>
         <div className="card-cartoon p-4 space-y-5">
@@ -226,16 +241,18 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-background/80 backdrop-blur-md z-40">
+      {/* Pulsante Genera Fisso in Basso */}
+      <div className="fixed bottom-0 left-0 right-0 p-5 bg-background/80 backdrop-blur-md z-40 border-t border-secondary">
         <Button
           onClick={handleGenerate}
           disabled={isLoading || ingredients.length === 0}
-          className="w-full h-16 btn-cartoon-primary text-xl font-black shadow-cartoon"
+          className="w-full h-16 btn-cartoon-primary text-xl font-black shadow-cartoon disabled:opacity-50"
         >
-          {isLoading ? t('generating') + '...' : t('generate_recipe')}
+          {isLoading ? `${t('generating')}...` : t('generate_recipe')}
         </Button>
       </div>
 
+      {/* Overlay Fotocamera */}
       {showCameraCapture && (
         <CameraCapture onCapture={handleImageCapture} onClose={() => setShowCameraCapture(false)} />
       )}
