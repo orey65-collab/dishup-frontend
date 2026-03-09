@@ -1,4 +1,4 @@
-import { Camera, Search, Plus, X, Dumbbell } from 'lucide-react';
+import { Camera, Search, Plus, X, Dumbbell, Leaf, Shovel, WheatOff } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -49,7 +49,7 @@ const resizeImage = (base64Str, maxWidth = 1024, maxHeight = 1024) => {
 
 export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const { t, language } = useLanguage();
-  const { ingredients, addIngredient, addIngredients, removeIngredient, clearPantry } = usePantry();
+  const { ingredients, addIngredient, addIngredients, removeIngredient } = usePantry();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -57,8 +57,29 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const [quickRecipe, setQuickRecipe] = useState(false);
   const [gourmet, setGourmet] = useState(false);
   const [gymGoal, setGymGoal] = useState('none');
+  
+  // Filtri Dietetici
+  const [isVegetarian, setIsVegetarian] = useState(false);
+  const [isVegan, setIsVegan] = useState(false);
+  const [isGlutenFree, setIsGlutenFree] = useState(false);
+
   const [showCameraCapture, setShowCameraCapture] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+
+  // Sincronizzazione Filtri: Vegano implica Vegetariano
+  const handleVeganToggle = (checked) => {
+    setIsVegan(checked);
+    if (checked) {
+      setIsVegetarian(true);
+    }
+  };
+
+  const handleVegetarianToggle = (checked) => {
+    setIsVegetarian(checked);
+    if (!checked) {
+      setIsVegan(false); // Se togli vegetariano, non può essere vegano
+    }
+  };
 
   const searchIngredients = useCallback(async (query) => {
     if (query.length < 2) {
@@ -111,8 +132,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   };
 
   const handleGenerate = () => {
-    console.log("Generazione avviata con:", { ingredients, gymGoal, selectedCourse });
-
     if (ingredients.length === 0) {
       toast.error(t('add_at_least_one'));
       return;
@@ -125,35 +144,38 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         quick_recipe: quickRecipe,
         gourmet,
         language,
-        gym_goal: gymGoal
+        gym_goal: gymGoal,
+        dietary: {
+          vegetarian: isVegetarian,
+          vegan: isVegan,
+          gluten_free: isGlutenFree
+        }
       });
-    } else {
-      console.error("Errore: onGenerateRecipe non è una funzione.");
     }
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-32">
+    <div className="flex flex-col min-h-screen pb-72">
       {/* Header */}
       <div className="bg-secondary/30 px-5 pt-8 pb-10 relative overflow-hidden">
         <div className="flex items-center gap-3 mb-2">
           <Logo size={48} />
-          <h1 className="text-3xl font-display font-bold text-foreground">{t('app_title')}</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground notranslate">DishUp</h1>
         </div>
         <p className="text-muted-foreground font-medium">{t('app_subtitle')}</p>
       </div>
 
-      {/* Pulsante Fotocamera */}
+      {/* Camera Button */}
       <div className="px-5 -mt-6">
         <button
           onClick={() => setShowCameraCapture(true)}
-          className="w-full h-16 btn-cartoon-primary flex items-center justify-center gap-3 font-bold shadow-cartoon"
+          className="w-full h-16 btn-cartoon-primary flex items-center justify-center gap-3 font-bold shadow-cartoon notranslate"
         >
           <Camera /> {isScanning ? t('scanning') : t('scan_ingredients')}
         </button>
       </div>
 
-      {/* Ricerca Ingredienti */}
+      {/* Search Input */}
       <div className="px-5 mt-6 relative">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -176,21 +198,20 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         )}
       </div>
 
-      {/* Dispensa Corrente */}
+      {/* Pantry Display */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold text-lg">🧊 {t('current_pantry')}</h2>
         <div className="flex flex-wrap gap-2 mt-3">
           {ingredients.map((ing, i) => (
-            <div key={i} className="ingredient-tag-cartoon flex items-center gap-2">
+            <div key={i} className="ingredient-tag-cartoon flex items-center gap-2 notranslate">
               <span className="capitalize">{ing}</span>
               <X className="w-4 h-4 cursor-pointer" onClick={() => removeIngredient(ing)} />
             </div>
           ))}
-          {ingredients.length === 0 && <p className="text-sm text-muted-foreground italic">La dispensa è vuota</p>}
         </div>
       </div>
 
-      {/* Tipo di Portata */}
+      {/* Course Selection */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4">{t('course_type')}</h2>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
@@ -198,7 +219,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
             <button
               key={id}
               onClick={() => setSelectedCourse(id)}
-              className={`category-pill-cartoon flex-shrink-0 ${selectedCourse === id ? 'active' : ''}`}
+              className={`category-pill-cartoon flex-shrink-0 notranslate ${selectedCourse === id ? 'active' : ''}`}
             >
               <span className="text-2xl">{icon}</span>
               <span className="text-xs font-bold">{t(labelKey)}</span>
@@ -207,52 +228,64 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Obiettivi GymRat */}
+      {/* Gym Goals */}
       <div className="px-5 mt-8">
-        <h2 className="font-display font-bold mb-4 flex items-center gap-2"><Dumbbell className="w-5 h-5" /> GymRat</h2>
+        <h2 className="font-display font-bold mb-4 flex items-center gap-2 notranslate"><Dumbbell className="w-5 h-5" /> GymRat</h2>
         <div className="card-cartoon p-4 grid grid-cols-2 gap-3">
           <button
-            onClick={() => setGymGoal(prev => prev === 'bulk' ? 'none' : 'bulk')}
-            className={`py-3 rounded-xl font-bold border-2 transition-all ${gymGoal === 'bulk' ? 'bg-orange-500 text-white border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white text-orange-500 border-orange-500'}`}
+            onClick={() => setGymGoal(gymGoal === 'bulk' ? 'none' : 'bulk')}
+            className={`py-3 rounded-xl font-bold border-2 transition-all notranslate ${gymGoal === 'bulk' ? 'bg-orange-500 text-white border-black' : 'bg-white text-orange-500 border-orange-500'}`}
           >
             🔥 Bulk
           </button>
           <button
-            onClick={() => setGymGoal(prev => prev === 'cut' ? 'none' : 'cut')}
-            className={`py-3 rounded-xl font-bold border-2 transition-all ${gymGoal === 'cut' ? 'bg-blue-500 text-white border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white text-blue-500 border-blue-500'}`}
+            onClick={() => setGymGoal(gymGoal === 'cut' ? 'none' : 'cut')}
+            className={`py-3 rounded-xl font-bold border-2 transition-all notranslate ${gymGoal === 'cut' ? 'bg-blue-500 text-white border-black' : 'bg-white text-blue-500 border-blue-500'}`}
           >
             ❄️ Cut
           </button>
         </div>
       </div>
 
-      {/* Filtri Extra */}
-      <div className="px-5 mt-8 mb-10">
+      {/* Filtri Dietetici e Extra */}
+      <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4">⚡ {t('filters')}</h2>
         <div className="card-cartoon p-4 space-y-5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="quick" className="font-bold">{t('quick_recipe')}</Label>
-            <Switch id="quick" checked={quickRecipe} onCheckedChange={setQuickRecipe} />
+            <Label className="font-bold flex items-center gap-2 notranslate"><Leaf className="w-4 h-4 text-green-500"/> {t('vegetarian') || 'Vegetariano'}</Label>
+            <Switch checked={isVegetarian} onCheckedChange={handleVegetarianToggle} />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="gourmet" className="font-bold">Gourmet Mode ✨</Label>
-            <Switch id="gourmet" checked={gourmet} onCheckedChange={setGourmet} />
+            <Label className="font-bold flex items-center gap-2 notranslate"><Shovel className="w-4 h-4 text-green-600"/> {t('vegan') || 'Vegano'}</Label>
+            <Switch checked={isVegan} onCheckedChange={handleVeganToggle} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="font-bold flex items-center gap-2 notranslate"><WheatOff className="w-4 h-4 text-amber-600"/> {t('gluten_free') || 'Celiaco'}</Label>
+            <Switch checked={isGlutenFree} onCheckedChange={setIsGlutenFree} />
+          </div>
+          <hr className="border-secondary/30" />
+          <div className="flex items-center justify-between">
+            <Label className="font-bold notranslate">{t('quick_recipe')}</Label>
+            <Switch checked={quickRecipe} onCheckedChange={setQuickRecipe} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="font-bold notranslate">Gourmet Mode ✨</Label>
+            <Switch checked={gourmet} onCheckedChange={setGourmet} />
           </div>
         </div>
       </div>
 
-      {/* Pulsante Genera Fisso in Basso */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-background/80 backdrop-blur-md z-40 border-t border-secondary">
+      {/* Pulsante Genera Fisso - Alzato per Navbar */}
+      <div className="fixed bottom-[85px] left-0 right-0 p-5 bg-gradient-to-t from-background via-background/95 to-transparent z-[100]">
         <Button
           onClick={handleGenerate}
           disabled={isLoading || ingredients.length === 0}
-          className="w-full h-16 btn-cartoon-primary text-xl font-black shadow-cartoon disabled:opacity-50"
+          className="w-full h-16 btn-cartoon-primary text-xl font-black shadow-cartoon disabled:opacity-50 notranslate"
         >
           {isLoading ? `${t('generating')}...` : t('generate_recipe')}
         </Button>
       </div>
 
-      {/* Overlay Fotocamera */}
       {showCameraCapture && (
         <CameraCapture onCapture={handleImageCapture} onClose={() => setShowCameraCapture(false)} />
       )}
