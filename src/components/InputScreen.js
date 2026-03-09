@@ -58,7 +58,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const [gourmet, setGourmet] = useState(false);
   const [gymGoal, setGymGoal] = useState('none');
   
-  // Filtri Dietetici
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [isVegan, setIsVegan] = useState(false);
   const [isGlutenFree, setIsGlutenFree] = useState(false);
@@ -66,19 +65,14 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
   const [showCameraCapture, setShowCameraCapture] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
-  // Sincronizzazione Filtri: Vegano implica Vegetariano
   const handleVeganToggle = (checked) => {
     setIsVegan(checked);
-    if (checked) {
-      setIsVegetarian(true);
-    }
+    if (checked) setIsVegetarian(true);
   };
 
   const handleVegetarianToggle = (checked) => {
     setIsVegetarian(checked);
-    if (!checked) {
-      setIsVegan(false); // Se togli vegetariano, non può essere vegano
-    }
+    if (!checked) setIsVegan(false);
   };
 
   const searchIngredients = useCallback(async (query) => {
@@ -114,10 +108,12 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
     try {
       const compressedImage = await resizeImage(imageData);
       const base64 = compressedImage.includes(',') ? compressedImage.split(',')[1] : compressedImage;
+      
+      // Chiamata allineata al backend ImageAnalysisRequest
       const response = await axios.post(`${API}/api/analyze-image`, {
-        image_base64: base64,
-        language
+        image_base64: base64
       }, { timeout: 60000 });
+      
       const detected = response.data.ingredients || [];
       if (detected.length > 0) {
         addIngredients(detected);
@@ -131,32 +127,35 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
     }
   };
 
+  // --- LOGICA ALLINEATA AL BACKEND (RecipeRequest) ---
   const handleGenerate = () => {
     if (ingredients.length === 0) {
       toast.error(t('add_at_least_one'));
       return;
     }
     
+    // Creiamo il payload esattamente come lo aspetta il server.py
+    const recipePayload = {
+      user_id: "dev_user_123", // Cambia in base alla tua logica utenti
+      ingredients: ingredients,
+      course_type: selectedCourse,
+      language: language,
+      gym_goal: gymGoal,
+      is_premium: true, // Switch per testare il limite Free del server
+      dietary: {
+        vegetarian: isVegetarian,
+        vegan: isVegan,
+        gluten_free: isGlutenFree
+      }
+    };
+
     if (typeof onGenerateRecipe === 'function') {
-      onGenerateRecipe({
-        ingredients,
-        course_type: selectedCourse,
-        quick_recipe: quickRecipe,
-        gourmet,
-        language,
-        gym_goal: gymGoal,
-        dietary: {
-          vegetarian: isVegetarian,
-          vegan: isVegan,
-          gluten_free: isGlutenFree
-        }
-      });
+      onGenerateRecipe(recipePayload);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen pb-72">
-      {/* Header */}
       <div className="bg-secondary/30 px-5 pt-8 pb-10 relative overflow-hidden">
         <div className="flex items-center gap-3 mb-2">
           <Logo size={48} />
@@ -165,7 +164,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         <p className="text-muted-foreground font-medium">{t('app_subtitle')}</p>
       </div>
 
-      {/* Camera Button */}
       <div className="px-5 -mt-6">
         <button
           onClick={() => setShowCameraCapture(true)}
@@ -175,7 +173,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </button>
       </div>
 
-      {/* Search Input */}
       <div className="px-5 mt-6 relative">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -190,7 +187,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         {suggestions.length > 0 && (
           <div className="absolute top-full left-5 right-5 mt-1 card-cartoon z-50 p-0 overflow-hidden">
             {suggestions.map((s, i) => (
-              <button key={i} onClick={() => handleAddIngredient(s)} className="w-full p-4 text-left hover:bg-secondary/50 border-b last:border-0 font-bold">
+              <button key={i} onClick={() => handleAddIngredient(s)} className="w-full p-4 text-left hover:bg-secondary/50 border-b last:border-0 font-bold notranslate">
                 {s}
               </button>
             ))}
@@ -198,7 +195,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         )}
       </div>
 
-      {/* Pantry Display */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold text-lg">🧊 {t('current_pantry')}</h2>
         <div className="flex flex-wrap gap-2 mt-3">
@@ -211,7 +207,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Course Selection */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4">{t('course_type')}</h2>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
@@ -228,7 +223,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Gym Goals */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4 flex items-center gap-2 notranslate"><Dumbbell className="w-5 h-5" /> GymRat</h2>
         <div className="card-cartoon p-4 grid grid-cols-2 gap-3">
@@ -247,20 +241,19 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Filtri Dietetici e Extra */}
       <div className="px-5 mt-8">
         <h2 className="font-display font-bold mb-4">⚡ {t('filters')}</h2>
         <div className="card-cartoon p-4 space-y-5">
           <div className="flex items-center justify-between">
-            <Label className="font-bold flex items-center gap-2 notranslate"><Leaf className="w-4 h-4 text-green-500"/> {t('vegetarian') || 'Vegetariano'}</Label>
+            <Label className="font-bold flex items-center gap-2 notranslate"><Leaf className="w-4 h-4 text-green-500"/> {t('vegetarian')}</Label>
             <Switch checked={isVegetarian} onCheckedChange={handleVegetarianToggle} />
           </div>
           <div className="flex items-center justify-between">
-            <Label className="font-bold flex items-center gap-2 notranslate"><Shovel className="w-4 h-4 text-green-600"/> {t('vegan') || 'Vegano'}</Label>
+            <Label className="font-bold flex items-center gap-2 notranslate"><Shovel className="w-4 h-4 text-green-600"/> {t('vegan')}</Label>
             <Switch checked={isVegan} onCheckedChange={handleVeganToggle} />
           </div>
           <div className="flex items-center justify-between">
-            <Label className="font-bold flex items-center gap-2 notranslate"><WheatOff className="w-4 h-4 text-amber-600"/> {t('gluten_free') || 'Celiaco'}</Label>
+            <Label className="font-bold flex items-center gap-2 notranslate"><WheatOff className="w-4 h-4 text-amber-600"/> {t('gluten_free')}</Label>
             <Switch checked={isGlutenFree} onCheckedChange={setIsGlutenFree} />
           </div>
           <hr className="border-secondary/30" />
@@ -275,7 +268,6 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
         </div>
       </div>
 
-      {/* Pulsante Genera Fisso - Alzato per Navbar */}
       <div className="fixed bottom-[85px] left-0 right-0 p-5 bg-gradient-to-t from-background via-background/95 to-transparent z-[100]">
         <Button
           onClick={handleGenerate}
