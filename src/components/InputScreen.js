@@ -141,7 +141,7 @@ export const InputScreen = ({ onGenerateRecipe, isLoading }) => {
       course_type: selectedCourse,
       language: language,
       gym_goal: gymGoal,
-      is_premium: true, // Switch per testare il limite Free del server
+      is_premium: false, // Switch per testare il limite Free del server
       dietary: {
         vegetarian: isVegetarian,
         vegan: isVegan,
